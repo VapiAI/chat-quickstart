@@ -1,14 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
-const openai = new OpenAI({
-  apiKey: process.env.VAPI_API_KEY!,
-  baseURL: 'https://api.vapi.ai/chat'
-});
-
 export async function POST(request: NextRequest) {
   try {
-    const { message } = await request.json();
+    const { message, apiKey, assistantId } = await request.json();
 
     if (!message) {
       return NextResponse.json(
@@ -17,18 +12,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!apiKey || !assistantId) {
+      return NextResponse.json(
+        { success: false, error: 'API key and assistant ID are required' },
+        { status: 400 }
+      );
+    }
+
+    // Create OpenAI client with user-provided API key
+    const openai = new OpenAI({
+      apiKey: apiKey,
+      baseURL: 'https://api.vapi.ai/chat'
+    });
+
+    // @ts-expect-error - VAPI supports these parameters
     const response = await openai.responses.create({
       model: 'gpt-4o',
       input: message,
       stream: true,
-      assistantId: '2abd3196-bfec-4f25-9131-8ec04328be95'
-    } as any);
+      assistantId: assistantId
+    });
 
     // Create a streaming response
     const stream = new ReadableStream({
       async start(controller) {
         try {
-          // @ts-ignore - Handle streaming response
           for await (const event of response) {
             if (event.type === 'response.output_text.delta') {
               const chunk = `data: ${JSON.stringify({ delta: event.delta })}\n\n`;

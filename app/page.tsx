@@ -12,9 +12,11 @@ export default function Chat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [apiKey, setApiKey] = useState('');
+  const [assistantId, setAssistantId] = useState('');
 
   const sendMessage = async () => {
-    if (!input.trim() || isLoading) return;
+    if (!input.trim() || isLoading || !apiKey.trim() || !assistantId.trim()) return;
 
     const userMessage: Message = {
       role: 'user',
@@ -42,6 +44,8 @@ export default function Chat() {
         },
         body: JSON.stringify({
           message: input,
+          apiKey: apiKey,
+          assistantId: assistantId,
         }),
       });
 
@@ -113,15 +117,58 @@ export default function Chat() {
     }
   };
 
+  const isConfigured = apiKey.trim() && assistantId.trim();
+
   return (
     <div className="flex flex-col h-screen bg-gray-50">
+      {/* Header with configuration */}
+      <div className="border-b border-gray-200 bg-white px-4 py-4">
+        <div className="max-w-2xl mx-auto">
+          <div className="flex justify-between items-center mb-3">
+            <div className="text-lg font-medium">Chat</div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <input
+                type="password"
+                value={apiKey}
+                onChange={(e) => setApiKey(e.target.value)}
+                placeholder="VAPI API Key"
+                className="w-full px-3 py-2 text-sm bg-gray-100 rounded-lg border-0 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:bg-white transition-all"
+              />
+            </div>
+            <div>
+              <input
+                type="text"
+                value={assistantId}
+                onChange={(e) => setAssistantId(e.target.value)}
+                placeholder="Assistant ID"
+                className="w-full px-3 py-2 text-sm bg-gray-100 rounded-lg border-0 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:bg-white transition-all"
+              />
+            </div>
+          </div>
+          
+          {!isConfigured && (
+            <div className="text-sm text-amber-600 bg-amber-50 px-3 py-2 rounded-lg">
+              Configure your API credentials to begin
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Messages Container */}
       <div className="flex-1 overflow-y-auto px-4 py-8">
         <div className="max-w-2xl mx-auto space-y-6">
           {messages.length === 0 ? (
             <div className="text-center text-gray-400 mt-32">
-              <div className="text-4xl font-light mb-4">Chat</div>
-              <p className="text-lg">Start a conversation</p>
+              <div className="text-4xl font-light mb-4">Ready to chat</div>
+              <p className="text-lg">
+                {isConfigured 
+                  ? 'Start a conversation with your assistant'
+                  : 'Configure your API credentials to begin'
+                }
+              </p>
             </div>
           ) : (
             messages.map((message, index) => (
@@ -165,10 +212,10 @@ export default function Chat() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Message..."
+                placeholder={isConfigured ? "Message..." : "Enter API credentials first..."}
                 className="w-full resize-none border-0 bg-gray-100 rounded-2xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:bg-white transition-all"
                 rows={1}
-                disabled={isLoading}
+                disabled={isLoading || !isConfigured}
                 style={{
                   minHeight: '48px',
                   maxHeight: '120px',
@@ -177,7 +224,7 @@ export default function Chat() {
             </div>
             <button
               onClick={sendMessage}
-              disabled={!input.trim() || isLoading}
+              disabled={!input.trim() || isLoading || !isConfigured}
               className="bg-gray-900 text-white p-3 rounded-2xl hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex-shrink-0"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
