@@ -17,6 +17,7 @@ import {
   Bot,
   Loader2,
 } from "lucide-react";
+import Image from "next/image";
 
 interface Message {
   role: "user" | "assistant";
@@ -142,17 +143,14 @@ export default function Chat() {
       <div className="border-b bg-card shadow-sm px-6 py-6">
         <div className="max-w-4xl mx-auto space-y-6">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10">
-                <MessageCircle className="w-5 h-5 text-primary" />
+            <div className="flex items-center space-x-4">
+              <div className="w-10 h-10">
+                <Image src="/icon.png" alt="Vapi" width={100} height={100} />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-foreground">
-                  Vapi Chat
+                <h1 className="text-3xl font-bold text-foreground tracking-tight">
+                  Vapi Chat Demo
                 </h1>
-                <p className="text-sm text-muted-foreground">
-                  AI Assistant Chat Interface
-                </p>
               </div>
             </div>
           </div>
@@ -170,6 +168,17 @@ export default function Chat() {
                 placeholder="Enter your VAPI API Key"
                 className="h-11"
               />
+              <p className="text-xs text-muted-foreground">
+                Use your <strong>private</strong> API key from{" "}
+                <a
+                  href="https://dashboard.vapi.ai"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline font-medium"
+                >
+                  dashboard.vapi.ai
+                </a>
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="assistant-id" className="text-sm font-semibold">
@@ -183,6 +192,17 @@ export default function Chat() {
                 placeholder="Enter your Assistant ID"
                 className="h-11"
               />
+              <p className="text-xs text-muted-foreground">
+                Create assistants in your{" "}
+                <a
+                  href="https://dashboard.vapi.ai"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline font-medium"
+                >
+                  Vapi dashboard
+                </a>
+              </p>
             </div>
           </div>
 
@@ -259,7 +279,7 @@ export default function Chat() {
                   </Avatar>
 
                   <Card
-                    className={`${
+                    className={`p-0 ${
                       message.role === "user"
                         ? "bg-primary text-primary-foreground border-primary/20"
                         : "bg-card"
@@ -274,29 +294,6 @@ export default function Chat() {
                 </div>
               </div>
             ))
-          )}
-
-          {isLoading && (
-            <div className="flex justify-start">
-              <div className="flex items-start space-x-3 max-w-3xl">
-                <Avatar className="w-8 h-8 flex-shrink-0">
-                  <AvatarFallback>
-                    <Bot className="w-4 h-4" />
-                  </AvatarFallback>
-                </Avatar>
-
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="flex items-center space-x-2">
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span className="text-sm text-muted-foreground">
-                        Assistant is typing...
-                      </span>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
           )}
         </div>
       </div>
